@@ -4,8 +4,13 @@ const productSchema = require("../database/models/product");
 const products_GET = async (req = request, res = response) => {
     try {
         const productsDB = await productSchema.find();
+
         console.log("Products storaged in DataBase:", productsDB);
-        res.json(productsDB);
+
+        res.json({
+            successfull: true,
+            response: productsDB
+        });
     } catch (error) {
         res.json({
             successfull: false,
