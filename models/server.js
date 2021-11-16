@@ -1,12 +1,16 @@
 const express = require("express");
+const morgan = require("morgan");
 const CORS = require("cors");
 
 class Server {
     constructor() {
         // Config
         this.app = express();
-        this.port = process.env.PORT;
-        this.usuariosPath = "/api/usuarios";
+        this.productsPath = "/api/products";
+        this.salesPath = "/api/sales";
+
+        //Server Settings
+        this.app.set("port", process.env.PORT || 8080);
 
         // Middlewares
         this.middlewares();
@@ -16,6 +20,9 @@ class Server {
 
         // Start
         this.listen();
+
+        // Connect MongoDB
+        this.connectDB();
     }
 
     middlewares() {
@@ -24,19 +31,25 @@ class Server {
 
         // Read and Parse
         this.app.use(express.json());
+        this.app.use(morgan("dev"));
+        this.app.use(express.urlencoded({ extended: false }));
 
         // Static Files
         this.app.use(express.static("public"));
     }
 
     routes() {
-        this.app.use(this.usuariosPath, require("../routes/usuarios.routes"));
+        this.app.use(this.productsPath, require("../routes/products.routes"));
     }
 
     listen() {
-        this.app.listen(this.port, () => {
-            console.warn("Servidor conectado...");
+        this.app.listen(this.app.get("port"), () => {
+            console.warn(`Server on port: ${this.app.get("port")}`);
         });
+    }
+
+    connectDB() {
+        require("../database");
     }
 }
 
